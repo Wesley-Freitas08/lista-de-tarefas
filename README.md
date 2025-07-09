@@ -1,1 +1,5 @@
-# Lista de Tarefas\n\n1. Adicionar nova tarefa\n2. Marcar tarefa como concluída\n3. Remover tarefa da lista
+# Lista de Tarefas
+
+1. Permitir que o usuário adicione novas tarefas à lista.
+2. Possibilitar marcar tarefas como concluídas.
+3. Remover tarefas da lista quando finalizadas.
