@@ -1,0 +1,247 @@
+Assento.java
+
+public class Assento {
+ 
+ //Atributos   
+ private int fileira;
+ private int numero;
+ private char status; //Para reprensentar 'L' ou 'x'
+    
+  //Métodos   
+   
+ public Assento(int fileira, int numero){
+     this.fileira = fileira;
+     this.numero = numero;
+     this.status = 'L'; // inicializa o assento livre já.
+ }
+ 
+  // Ocupa o assento, Alterando seu status para 'X'.
+ public void ocupar(){
+     this.status = 'X';
+ }
+ 
+ //Libera o assento, alterando seu status para 'L'.
+ public void liberar() {
+     this.status = 'L';
+ }
+ 
+ //Verifica se o assento está livre.
+ public boolean estaLivre(){
+     return this.status == 'L';
+ }
+
+ //Retorna o status atual do assento.
+ public char getStatus(){
+     return this.status;
+   } 
+}
+
+
+SalaDeCinema.java
+
+
+public class SalaDeCinema {
+
+//Atributos para o Tamanho da sala.
+private Assento[][] assentos; //Uma matriz de objetos Assento
+private final int FILEIRAS = 10;
+private final int ASSENTOS_POR_FILEIRA = 20;
+
+//Construtor da SalaDeCinema. inicializa a matriz de assentos pedido.
+public SalaDeCinema(){
+    this.assentos = new Assento[FILEIRAS][ASSENTOS_POR_FILEIRA];
+   // Popula a matriz com novos objetos Assento
+      for (int i = 0; i < FILEIRAS; i++) {
+       for (int j = 0; j < ASSENTOS_POR_FILEIRA; j++) {
+    // Instancia um novo objeto Assento para cada posição
+          this.assentos[i][j] = new Assento(i + 1, j + 1);
+            }
+        }
+    } 
+    
+    public void exibirMapa(){
+     System.out.println("\n--- Mapa de Assentos ---");
+        // Imprime os números dos assentos (colunas)
+        System.out.print("Assentos:  ");
+        for (int j = 1; j <= ASSENTOS_POR_FILEIRA; j++) {
+            System.out.printf("%-3d", j);
+        }
+        System.out.println();   
+    
+      // Imprime o mapa da sala usando o status dos objetos Assento
+        for (int i = 0; i < FILEIRAS; i++) {
+            System.out.printf("Fileira %2d: ", (i + 1));
+            for (int j = 0; j < ASSENTOS_POR_FILEIRA; j++) {
+                System.out.print("[" + this.assentos[i][j].getStatus() + "]");
+            }
+            System.out.println();
+        }
+    }
+
+    public boolean comprarIngresso(int fileira, int numeroOAssento) {
+    if (fileira < 1 || fileira > FILEIRAS || numeroOAssento < 1 || numeroOAssento > ASSENTOS_POR_FILEIRA) {
+        System.out.println("Erro: Fileira ou assento inválido.");
+        return false;
+    }
+
+    Assento assentoEscolhido = this.assentos[fileira - 1][numeroOAssento - 1];
+
+    if (assentoEscolhido.estaLivre()) {
+        assentoEscolhido.ocupar();
+        System.out.println("Ingresso comprado com sucesso para o assento " + fileira + "-" + numeroOAssento + ".");
+        return true;
+    } else {
+        System.out.println("Erro: O assento já está ocupado.");
+        return false;
+    }
+}
+  Assento assentoEscolhido = this.assentos[fileira - 1][numeroOAssento - 1];
+
+ // Verifica se o assento está ocupado para cancelar
+        if (!assentoEscolhido.estaLivre()) {
+            assentoEscolhido.liberar();
+            System.out.println("Compra cancelada. Assento " + fileira + "-" + numeroOAssento + " agora está livre.");
+            return true;
+        } else {
+            System.out.println("Este assento já está livre. Não há compra para cancelar.");
+            return false;
+        }
+    }
+
+
+   public void exibirRelatorio() {
+    int totalAssentos = FILEIRAS * ASSENTOS_POR_FILEIRA;
+    int ocupados = 0;
+
+    // Percorre a matriz para contar os assentos ocupados
+    for (int i = 0; i < FILEIRAS; i++) {
+        for (int j = 0; j < ASSENTOS_POR_FILEIRA; j++) {
+            if (!this.assentos[i][j].estaLivre()) {
+                ocupados++;
+            }
+        }
+}
+  
+    int livres = totalAssentos - ocupados;
+    double percentualOcupacao = (double) ocupados / totalAssentos * 100;
+
+    System.out.println("\n--- Relatório de Ocupação ---");
+    System.out.println("Total de assentos: " + totalAssentos);
+    System.out.println("Assentos ocupados: " + ocupados);
+    System.out.println("Assentos livres: " + livres);
+    System.out.printf("Percentual de ocupação: %.2f%%\n", percentualOcupacao);}
+
+    public void cancelarCompra(int fileira, int numeroOAssento) {
+    if (fileira < 1 || fileira > FILEIRAS || numeroOAssento < 1 || numeroOAssento > ASSENTOS_POR_FILEIRA) {
+        System.out.println("Erro: Fileira ou assento inválido.");
+        return;
+    }
+
+    Assento assento = this.assentos[fileira - 1][numeroOAssento - 1];
+
+    if (!assento.estaLivre()) {
+        assento.liberar();
+        System.out.println("Compra cancelada. Assento " + fileira + "-" + numeroOAssento + " agora está livre.");
+    } else {
+        System.out.println("Este assento já está livre. Não há compra para cancelar.");
+    }
+ }
+}
+
+    
+Classe Principal ( CineDev)
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class CineDev {
+
+    public static void main(String[] args) {
+        // Cria uma instância da SalaDeCinema.
+        SalaDeCinema sala = new SalaDeCinema();
+        Scanner scanner = new Scanner(System.in);
+        int opcao;
+
+        do {
+            exibirMenuPrincipal();
+            opcao = lerOpcao(scanner);
+
+            switch (opcao) {
+                case 1:
+                    sala.exibirMapa();
+                    break;
+                case 2:
+                    comprarIngresso(sala, scanner);
+                    break;
+                case 3:
+                    cancelarCompra(sala, scanner);
+                    break;
+                case 4:
+                    sala.exibirRelatorio();
+                    break;
+                case 5:
+                    System.out.println("Saindo do sistema. Obrigado por usar o CineDev!");
+                    break;
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+        } while (opcao != 5);
+
+        scanner.close();
+    }
+
+   
+     // Exibe o menu principal do sistema.
+     
+    public static void exibirMenuPrincipal() {
+        System.out.println("\n--- CineDev - Menu Principal ---");
+        System.out.println("1. Exibir Mapa de Assentos");
+        System.out.println("2. Comprar Ingresso");
+        System.out.println("3. Cancelar Compra de Ingresso");
+        System.out.println("4. Exibir Relatório de Ocupação");
+        System.out.println("5. Sair");
+        System.out.print("Escolha uma opção: ");
+    }
+   
+    public static int lerOpcao(Scanner scanner) {
+        try {
+            return scanner.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida. Por favor, digite um número.");
+            scanner.next(); // Limpa o buffer do scanner
+            return -1;
+        }
+    }
+
+    
+     // Coleta os dados para a compra de ingresso e chama o método correspondente na sala.
+     
+    public static void comprarIngresso(SalaDeCinema sala, Scanner scanner) {
+        try {
+            System.out.print("Digite a fileira (1-10): ");
+            int fileira = scanner.nextInt();
+            System.out.print("Digite o assento (1-20): ");
+            int assento = scanner.nextInt();
+            sala.comprarIngresso(fileira, assento);
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida. Por favor, digite números inteiros.");
+            scanner.next(); // Limpa o buffer do scanner
+        }
+    }
+
+    
+     // Coleta os dados para o cancelamento de compra e chama o método na sala.
+    
+    public static void cancelarCompra(SalaDeCinema sala, Scanner scanner) {
+        try {
+            System.out.print("Digite a fileira (1-10): ");
+            int fileira = scanner.nextInt();
+            System.out.print("Digite o assento (1-20): ");
+            int assento = scanner.nextInt();
+            sala.cancelarCompra(fileira, assento);
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida. Por favor, digite números inteiros.");
+            scanner.next(); // Limpa o buffer do scanner
+        }
+    }
+}
