@@ -65,3 +65,52 @@ CREATE TABLE Carga (
     FOREIGN KEY (id_viagem) REFERENCES Viagem(id_viagem),
     FOREIGN KEY (sku_produto) REFERENCES Produto(sku)
 );
+
+-- Inserindo Dados de Teste
+INSERT INTO Categoria (nome) VALUES ('Logística'), ('Eletrônicos');
+
+INSERT INTO Produto VALUES 
+('SKU001', 'Smartphone X', '64GB Preto', 2),
+('SKU002', 'Notebook Pro', 'SSD 512GB', 2),
+('SKU003', 'Cabo HDMI', '2 metros', 2),
+('SKU004', 'Mouse Sem Fio', 'Óptico', 2),
+('SKU005', 'Monitor 27', '4K UHD', 2);
+
+INSERT INTO Armazem (nome, cidade, estado, capacidade) VALUES 
+('CD São Leo', 'São Leopoldo', 'RS', 10000),
+('CD PoA', 'Porto Alegre', 'RS', 15000),
+('CD Curitiba', 'Curitiba', 'PR', 12000);
+
+-- Estoque inicial distribuído
+INSERT INTO Estoque VALUES (1, 'SKU001', 50), (1, 'SKU002', 20), (2, 'SKU003', 100);
+
+INSERT INTO Motorista VALUES ('111222333', 'Wesley Silva'), ('444555666', 'João Pereira');
+INSERT INTO Veiculo VALUES ('ABC1234', 'Volvo FH', 40000), ('XYZ5678', 'Scania R', 45000);
+
+-- 2 viagens (uma 'Em trânsito' e uma 'Entregue')
+INSERT INTO Viagem (data_saida, previsao_chegada, status, fk_Veiculo_Placa, fk_Motorista_CNH, fk_Armazem_Origem, fk_Armazem_Destino)
+VALUES ('2026-02-18', '2026-02-20', 'Em trânsito', 'ABC1234', '111222333', 1, 2),
+       ('2026-02-15', '2026-02-17', 'Entregue', 'XYZ5678', '444555666', 2, 3);
+
+-- Carga da viagem (quais produtos estão na viagem 1)
+INSERT INTO Carga VALUES (1, 'SKU001', 10), (1, 'SKU002', 5);
+
+
+-- 1. Inventário Total
+SELECT P.nome AS Produto, A.nome AS Armazem, E.quantidade 
+FROM Produto P 
+JOIN Estoque E ON P.sku = E.sku_produto 
+JOIN Armazem A ON E.id_armazem = A.id_armazem;
+
+-- 2. Manifesto da Viagem
+SELECT V.id_viagem, M.nome AS Motorista, P.nome AS Produto, C.quantidade 
+FROM Viagem V 
+JOIN Motorista M ON V.fk_Motorista_CNH = M.cnh 
+JOIN Carga C ON V.id_viagem = C.id_viagem 
+JOIN Produto P ON C.sku_produto = P.sku;
+
+-- 3. O Trajeto (Uso de aliases para diferenciar os armazéns)
+SELECT V.id_viagem, AO.nome AS Origem, AD.nome AS Destino 
+FROM Viagem V 
+JOIN Armazem AO ON V.fk_Armazem_Origem = AO.id_armazem 
+JOIN Armazem AD ON V.fk_Armazem_Destino = AD.id_armazem;
